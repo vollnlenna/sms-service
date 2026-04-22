@@ -39,9 +39,14 @@ export class MessagesController {
     );
   }
 
-  @Get(':deviceId')
-  getByDevice(@Param('deviceId', ParseIntPipe) deviceId: number) {
-    return this.messagesService.getMessagesByDevice(deviceId);
+  @Get(':deviceId/sent')
+  getSent(@Param('deviceId', ParseIntPipe) deviceId: number) {
+    return this.messagesService.getSentMessages(deviceId);
+  }
+
+  @Get(':deviceId/received')
+  getReceived(@Param('deviceId', ParseIntPipe) deviceId: number) {
+    return this.messagesService.getReceivedMessages(deviceId);
   }
 
   @Patch(':id/status')

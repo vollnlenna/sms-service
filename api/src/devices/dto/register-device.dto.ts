@@ -2,8 +2,8 @@ import { IsString } from 'class-validator';
 
 export class RegisterDeviceDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  phone_number: string;
+  phone_number!: string;
 }
