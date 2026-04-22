@@ -467,4 +467,55 @@ textarea {
   opacity: 0.7;
   padding: 10px 0;
 }
+
+@media (max-width: 900px) {
+  .content {
+    gap: 12px;
+  }
+
+  .sendPanel {
+    width: 280px;
+  }
+
+  .filtersRowDates {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .statusSelect {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 650px) {
+  .tabs {
+    justify-content: center;
+  }
+
+  .content {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .listArea {
+    width: 100%;
+  }
+
+  .sendPanel {
+    width: 100%;
+  }
+
+  .filtersRowDates {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .statusSelect {
+    min-width: 180px;
+  }
+
+  .searchInput {
+    max-width: 100%;
+  }
+}
 </style>
