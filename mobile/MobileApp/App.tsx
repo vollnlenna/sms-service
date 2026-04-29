@@ -1,45 +1,34 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RootNavigator from './src/navigation/RootNavigator';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [deviceId, setDeviceId] = useState<number | null>(null);
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    (async () => {
+      const v = await AsyncStorage.getItem('deviceId');
+      setDeviceId(v ? Number(v) : null);
+      setLoading(false);
+    })();
+  }, []);
 
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
+  return <RootNavigator deviceId={deviceId} onRegistered={setDeviceId} />;
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loader: {
     flex: 1,
+    justifyContent: 'center',
   },
 });
-
-export default App;

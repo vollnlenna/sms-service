@@ -31,6 +31,18 @@ export class DevicesService {
   }
 
   async registerDevice(name: string, phone: string): Promise<Device> {
+    const existing: QueryResult<Device> = await this.pool.query(
+      `SELECT *
+     FROM devices
+     WHERE phone_number = $1
+     LIMIT 1`,
+      [phone],
+    );
+
+    if (existing.rows.length > 0) {
+      return existing.rows[0];
+    }
+
     const id_device = await this.generateUniqueDeviceId();
 
     const result: QueryResult<Device> = await this.pool.query(
