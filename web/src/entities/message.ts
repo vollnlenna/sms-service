@@ -3,6 +3,7 @@ export interface Message {
   id_device: number
   phone_to: string
   text: string
-  status: 'pending' | 'sent' | 'delivered' | 'failed'
+  status: 'pending' | 'sent' | 'failed'
   created_at: string
+  phone_from?: string
 }

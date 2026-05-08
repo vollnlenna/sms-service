@@ -23,11 +23,6 @@ export function useAuth() {
     }
   }
 
-  const setDevice = (id: string) => {
-    deviceId.value = id
-    localStorage.setItem('deviceId', id)
-  }
-
   const logout = () => {
     deviceId.value = null
     localStorage.removeItem('deviceId')
@@ -38,7 +33,6 @@ export function useAuth() {
     isLoggedIn: deviceId,
     init,
     login,
-    setDevice,
     logout,
   }
 }

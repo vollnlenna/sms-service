@@ -39,6 +39,11 @@ export class MessagesController {
     );
   }
 
+  @Get(':deviceId/pending')
+  getPending(@Param('deviceId', ParseIntPipe) deviceId: number) {
+    return this.messagesService.getPendingMessages(deviceId);
+  }
+
   @Get(':deviceId/sent')
   getSent(@Param('deviceId', ParseIntPipe) deviceId: number) {
     return this.messagesService.getSentMessages(deviceId);

@@ -60,6 +60,20 @@ services:
     networks:
       - default
 
+  docs:
+    build:
+      context: .
+      dockerfile: containers/docs/Dockerfile
+    container_name: docs
+    env_file:
+      - .env
+    ports:
+      - "${DOCS_PORT}:5173"
+    volumes:
+      - ./docs:/app
+    networks:
+      - default
+
 volumes:
   pgdata:
 

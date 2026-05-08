@@ -8,7 +8,6 @@ export function useApiKeys(deviceId: number | null) {
 
   const loadKeys = async () => {
     if (!deviceId) {
-      console.error('deviceId is null/undefined')
       return
     }
 
@@ -17,7 +16,6 @@ export function useApiKeys(deviceId: number | null) {
       const res = await http.get<ApiKey[]>(`/api-keys/${deviceId}`)
       keys.value = res.data
     } catch (err) {
-      console.error('loadKeys error:', err)
     } finally {
       loading.value = false
     }
@@ -25,26 +23,20 @@ export function useApiKeys(deviceId: number | null) {
 
   const createKey = async () => {
     if (!deviceId) {
-      console.error('deviceId is null/undefined')
       return
     }
 
     try {
-      const res = await http.post<ApiKey>(`/api-keys/${deviceId}`)
-      console.log('created:', res.data)
+      await http.post<ApiKey>(`/api-keys/${deviceId}`)
       await loadKeys()
-    } catch (err) {
-      console.error('createKey error:', err)
-    }
+    } catch (err) {}
   }
 
   const deleteKey = async (id_api: number) => {
     try {
       await http.delete(`/api-keys/${id_api}`)
       await loadKeys()
-    } catch (err) {
-      console.error('deleteKey error:', err)
-    }
+    } catch (err) {}
   }
 
   return {

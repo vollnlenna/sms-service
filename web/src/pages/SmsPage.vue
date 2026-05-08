@@ -1,11 +1,21 @@
 <template>
   <div class="page">
     <div class="tabs">
-      <button type="button" class="tab" :class="{ active: tab === 'sent' }" @click="switchTab('sent')">
+      <button
+        type="button"
+        class="tab"
+        :class="{ active: tab === 'sent' }"
+        @click="switchTab('sent')"
+      >
         Отправленные
       </button>
 
-      <button type="button" class="tab" :class="{ active: tab === 'received' }" @click="switchTab('received')">
+      <button
+        type="button"
+        class="tab"
+        :class="{ active: tab === 'received' }"
+        @click="switchTab('received')"
+      >
         Полученные
       </button>
     </div>
@@ -28,13 +38,12 @@
               <input type="date" v-model="dateTo" />
             </label>
 
-            <label class="statusSelect">
+            <label v-if="tab === 'sent'" class="statusSelect">
               Статус:
               <select v-model="statusFilter">
                 <option value="all">Все</option>
                 <option value="pending">В ожидании</option>
                 <option value="sent">Отправлено</option>
-                <option value="delivered">Доставлено</option>
                 <option value="failed">Ошибка</option>
               </select>
             </label>
@@ -50,14 +59,14 @@
         <div v-else class="list">
           <div v-for="msg in displayMessages" :key="msg.id_message" class="card">
             <div class="top">
-              <b>{{ formatPhone(msg.phone_to) }}</b>
+              <b>{{ formatPhone(tab === 'received' ? msg.phone_from : msg.phone_to) }}</b>
               <span>{{ formatDate(msg.created_at) }}</span>
             </div>
 
             <div class="text">{{ msg.text }}</div>
 
-            <div class="bottom">
-              <span :class="msg.status">{{ msg.status }}</span>
+            <div v-if="tab === 'sent'" class="bottom">
+              <span :class="msg.status">{{ ruStatusLabel(msg.status) }}</span>
               <button class="deleteBtn" @click="deleteMessage(msg.id_message)">Удалить</button>
             </div>
           </div>
@@ -83,26 +92,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useMessages } from '@/composables/useMessages'
 import PhoneInput from '@/components/PhoneInput.vue'
 
 const stored = localStorage.getItem('deviceId')
 const deviceId = stored && stored !== 'guest' ? Number(stored) : null
 
-const { sent, received, loadSent, loadReceived, sendMessage, deleteMessage, loading } =
-  useMessages(deviceId)
+const { sent, received, loadSent, loadReceived, sendMessage, deleteMessage, loading } = useMessages(deviceId)
 
 const phone = ref('')
 const text = ref('')
 const tab = ref<'sent' | 'received'>('sent')
 
-type MsgStatus = 'pending' | 'sent' | 'delivered' | 'failed'
+type MsgStatus = 'pending' | 'sent' | 'failed'
 
 const qAll = ref('')
 const dateFrom = ref('')
 const dateTo = ref('')
 const statusFilter = ref<MsgStatus | 'all'>('all')
+
+watch(tab, (newTab) => {
+  if (newTab === 'received') {
+    statusFilter.value = 'all'
+  }
+})
 
 const resetFilters = () => {
   qAll.value = ''
@@ -119,8 +133,6 @@ const ruStatusLabel = (s: MsgStatus) => {
       return 'в ожидании'
     case 'sent':
       return 'отправлено'
-    case 'delivered':
-      return 'доставлено'
     case 'failed':
       return 'ошибка'
   }
@@ -149,19 +161,23 @@ const displayMessages = computed(() => {
 
   return list.filter((msg) => {
     if (query) {
-      const matchesPhone = queryDigits ? normalizeDigits(msg.phone_to).includes(queryDigits) : false
+      const phoneField = tab.value === 'received' ? msg.phone_from : msg.phone_to
+      const matchesPhone = queryDigits
+        ? normalizeDigits(phoneField || '').includes(queryDigits)
+        : false
       const matchesText = msg.text?.toLowerCase().includes(query)
 
       const matchesStatus =
-        (msg.status as string).toLowerCase().includes(query) ||
-        ruStatusLabel(msg.status as MsgStatus).includes(query)
+        tab.value === 'sent' &&
+        ((msg.status as string).toLowerCase().includes(query) ||
+          ruStatusLabel(msg.status as MsgStatus).includes(query))
 
       const matchesDate = String(msg.created_at).toLowerCase().includes(query)
 
       if (!(matchesPhone || matchesText || matchesStatus || matchesDate)) return false
     }
 
-    if (statusFilter.value !== 'all') {
+    if (tab.value === 'sent' && statusFilter.value !== 'all') {
       if (msg.status !== statusFilter.value) return false
     }
 
@@ -194,7 +210,7 @@ const handleSend = async () => {
   if (!isValidPhone(phone.value)) return alert('Неверный номер')
   if (!text.value.trim()) return alert('Пустое сообщение')
 
-  const cleanPhone = phone.value.replace(/\D/g, '')
+  const cleanPhone = '+' + phone.value.replace(/\D/g, '')
 
   try {
     await sendMessage(cleanPhone, text.value)
@@ -206,14 +222,15 @@ const handleSend = async () => {
 
     tab.value = 'sent'
     await loadSent()
-  } catch (e) {
-    console.error(e)
-    alert('Не удалось отправить СМС')
+  } catch {
+    alert('Не удалось отправить СМС (возможно ваше устройство не активно)')
   }
 }
 
-const formatPhone = (v: string) => {
+const formatPhone = (v: string | undefined) => {
+  if (!v) return '—'
   const d = v.replace(/\D/g, '')
+  if (d.length < 11) return v
   return `+7 ${d.slice(1, 4)} ${d.slice(4, 7)} ${d.slice(7, 9)} ${d.slice(9, 11)}`
 }
 
@@ -297,6 +314,8 @@ const formatDate = (d: string) => new Date(d).toLocaleString()
 .card {
   border: 1px solid rgba(0, 0, 0, 0.35);
   padding: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .top {
@@ -308,6 +327,11 @@ const formatDate = (d: string) => new Date(d).toLocaleString()
 
 .text {
   margin: 10px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .bottom {
@@ -315,17 +339,17 @@ const formatDate = (d: string) => new Date(d).toLocaleString()
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  margin-top: auto;
 }
 
 .pending {
   color: gray;
 }
+
 .sent {
   color: #1e5cff;
 }
-.delivered {
-  color: #0a8a0a;
-}
+
 .failed {
   color: #d10000;
 }

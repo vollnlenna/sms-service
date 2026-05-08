@@ -1,4 +1,4 @@
-import { http } from './http.ts';
+import { http } from './http';
 
 export type Device = {
   id_device: number;
@@ -13,5 +13,5 @@ export async function registerDevice(payload: {
   phone_number: string;
 }): Promise<Device> {
   const res = await http.post<Device>('/devices/register', payload);
-  return res.data;
+  return res.data as Device;
 }

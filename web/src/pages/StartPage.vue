@@ -5,11 +5,9 @@
 
       <p>Введите ID устройства с мобильного приложения</p>
 
-      <input v-model="deviceId" placeholder="id" />
+      <input v-model="deviceId" placeholder="id" @keyup.enter="login" />
 
       <button @click="login">Войти</button>
-
-      <button class="guest" @click="guest">Войти как гость</button>
 
       <p v-if="error" class="error">Устройство не найдено</p>
     </div>
@@ -43,11 +41,6 @@ const login = async () => {
   }
 
   await router.replace('/sms')
-}
-
-const guest = () => {
-  auth.setDevice('guest')
-  router.replace('/sms')
 }
 </script>
 
@@ -85,11 +78,6 @@ button {
 button:hover {
   background: #000;
   color: #fff;
-}
-
-.guest {
-  margin-top: 20px;
-  border: 1px dashed #000;
 }
 
 .error {
