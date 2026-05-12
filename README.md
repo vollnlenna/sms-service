@@ -14,7 +14,7 @@
 <h3>1. Создать файл конфигурации</h3>
 <pre><code>cp .env.example .env</code></pre>
 <p>* Для реального Android-устройства в файле <code>.env</code> поменять адрес API_URL</p>
-<pre><code>API_URL=http://IP_КОМПЬЮТЕРА:3000</code></pre>
+<pre><code>API_URL=http://IP_КОМПЬЮТЕРА/api</code></pre>
 <hr>
 <h3>2. Запустить веб-приложение</h3>
 <pre><code>docker compose up</code></pre>
