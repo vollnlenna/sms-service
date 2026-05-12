@@ -6,6 +6,7 @@ export default defineConfig({
     head: [
         ['link', { rel: 'icon', type: 'image/x-icon', href: '/sms.ico' }]
     ],
+    base: '/docs/',
 
     themeConfig: {
         nav: [

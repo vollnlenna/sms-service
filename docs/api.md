@@ -7,7 +7,7 @@
 
 Пример запроса:
 ```bash
-curl -X POST http://localhost:3000/messages \
+curl -X POST http://localhost/api/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: YOUR_API_KEY" \
   -d '{

@@ -21,7 +21,7 @@
 <p>Открыть веб-приложение в браузере:</p>
 <a href="http://localhost" target="_blank">http://localhost</a><br><br>
 <p><strong>Документация:</strong></p>
-<a href="http://localhost:3002" target="_blank">http://localhost:3002</a>
+<a href="http://localhost/docs" target="_blank">http://localhost/docs</a>
 <hr>
 <h3>3. Запустить мобильное приложение</h3>
 <pre><code>cd mobile/MobileApp</code></pre>
